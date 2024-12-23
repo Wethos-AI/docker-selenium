@@ -1117,6 +1117,8 @@ chromeNode:
     browserName: "chrome"
     # -- sessionBrowserName if the browserName is different from the sessionBrowserName
     sessionBrowserName: "chrome"
+    # -- browserVersion from the capability
+    browserVersion: ""
     # -- platformName from the capability
     platformName: "linux"
     # browserVersion: '91.0' # Optional. Only required when supporting multiple versions of browser in your Selenium Grid.
@@ -1300,6 +1302,8 @@ firefoxNode:
     browserName: "firefox"
     # -- sessionBrowserName if the browserName is different from the sessionBrowserName
     sessionBrowserName: "firefox"
+    # -- browserVersion from the capability
+    browserVersion: ""
     # -- platformName from the capability
     platformName: "linux"
     # -- Skip check SSL when connecting to the Graphql endpoint
@@ -1482,6 +1486,8 @@ edgeNode:
     browserName: "MicrosoftEdge"
     # -- sessionBrowserName if the browserName is different from the sessionBrowserName
     sessionBrowserName: "msedge"
+    # -- browserVersion from the capability
+    browserVersion: ""
     # -- platformName from the capability
     platformName: "linux"
     # -- Skip check SSL when connecting to the Graphql endpoint
@@ -1666,6 +1672,8 @@ relayNode:
     sessionBrowserName: ""
     # -- platformName from the capability
     platformName: "Android"
+    # -- browserVersion from the capability
+    browserVersion: ""
     # browserVersion: '91.0' # Optional. Only required when supporting multiple versions of browser in your Selenium Grid.
     # -- Skip check SSL when connecting to the Graphql endpoint
     unsafeSsl: '{{ template "seleniumGrid.graphqlURL.unsafeSsl" . }}'  # Optional

@@ -406,6 +406,7 @@ A Helm chart for creating a Selenium Grid Server in Kubernetes
 | chromeNode.scaledObjectOptions | string | `nil` | Override the scaledObjectOptions for chrome nodes |
 | chromeNode.hpa.browserName | string | `"chrome"` | browserName from the capability |
 | chromeNode.hpa.sessionBrowserName | string | `"chrome"` | sessionBrowserName if the browserName is different from the sessionBrowserName |
+| chromeNode.hpa.browserVersion | string | `""` | browserVersion from the capability |
 | chromeNode.hpa.platformName | string | `"linux"` | platformName from the capability |
 | chromeNode.hpa.unsafeSsl | string | `"{{ template \"seleniumGrid.graphqlURL.unsafeSsl\" . }}"` | Skip check SSL when connecting to the Graphql endpoint |
 | chromeNode.initContainers | list | `[]` | It is used to add initContainers in the same pod of the browser node. It should be set using the --set-json option |
@@ -457,6 +458,7 @@ A Helm chart for creating a Selenium Grid Server in Kubernetes
 | firefoxNode.scaledObjectOptions | string | `nil` | Override the scaledObjectOptions for firefox nodes |
 | firefoxNode.hpa.browserName | string | `"firefox"` | browserName from the capability |
 | firefoxNode.hpa.sessionBrowserName | string | `"firefox"` | sessionBrowserName if the browserName is different from the sessionBrowserName |
+| firefoxNode.hpa.browserVersion | string | `""` | browserVersion from the capability |
 | firefoxNode.hpa.platformName | string | `"linux"` | platformName from the capability |
 | firefoxNode.hpa.unsafeSsl | string | `"{{ template \"seleniumGrid.graphqlURL.unsafeSsl\" . }}"` | Skip check SSL when connecting to the Graphql endpoint |
 | firefoxNode.initContainers | list | `[]` | It is used to add initContainers in the same pod of the browser node. It should be set using the --set-json option |
@@ -508,6 +510,7 @@ A Helm chart for creating a Selenium Grid Server in Kubernetes
 | edgeNode.scaledObjectOptions | string | `nil` | Override the scaledObjectOptions for edge nodes |
 | edgeNode.hpa.browserName | string | `"MicrosoftEdge"` | browserName from the capability |
 | edgeNode.hpa.sessionBrowserName | string | `"msedge"` | sessionBrowserName if the browserName is different from the sessionBrowserName |
+| edgeNode.hpa.browserVersion | string | `""` | browserVersion from the capability |
 | edgeNode.hpa.platformName | string | `"linux"` | platformName from the capability |
 | edgeNode.hpa.unsafeSsl | string | `"{{ template \"seleniumGrid.graphqlURL.unsafeSsl\" . }}"` | Skip check SSL when connecting to the Graphql endpoint |
 | edgeNode.initContainers | list | `[]` | It is used to add initContainers in the same pod of the browser node. It should be set using the --set-json option |
@@ -560,6 +563,7 @@ A Helm chart for creating a Selenium Grid Server in Kubernetes
 | relayNode.hpa.browserName | string | `"chrome"` | browserName from the capability |
 | relayNode.hpa.sessionBrowserName | string | `""` | sessionBrowserName if the browserName is different from the sessionBrowserName |
 | relayNode.hpa.platformName | string | `"Android"` | platformName from the capability |
+| relayNode.hpa.browserVersion | string | `""` | browserVersion from the capability |
 | relayNode.hpa.unsafeSsl | string | `"{{ template \"seleniumGrid.graphqlURL.unsafeSsl\" . }}"` | Skip check SSL when connecting to the Graphql endpoint |
 | relayNode.initContainers | list | `[]` | It is used to add initContainers in the same pod of the browser node. It should be set using the --set-json option |
 | relayNode.sidecars | list | `[]` | It is used to add sidecars proxy in the same pod of the browser node. It means it will add a new container to the deployment itself. It should be set using the --set-json option |

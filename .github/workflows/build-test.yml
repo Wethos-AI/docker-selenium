@@ -25,6 +25,10 @@ on:
     paths-ignore:
       - '**.md'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref == github.ref_protected && github.run_id || github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions: write-all
 
 env:
@@ -44,6 +48,7 @@ jobs:
   helm-chart-test:
     name: Test Selenium Grid on Kubernetes
     uses: ./.github/workflows/helm-chart-test.yml
+    secrets: inherit
     with:
       release: ${{ inputs.release == 'true' }}
 
