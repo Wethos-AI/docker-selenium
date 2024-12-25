@@ -39,7 +39,7 @@ services:
       - SE_ENABLE_TRACING=false
 
   standalone_firefox:
-    image: selenium/standalone-firefox:4.27.0-20241225
+    image: selenium/standalone-firefox:133.0.3-20241225
     shm_size: 2gb
     ports:
       - "6444:4444"
