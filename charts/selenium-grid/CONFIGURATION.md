@@ -18,7 +18,7 @@ A Helm chart for creating a Selenium Grid Server in Kubernetes
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://charts.bitnami.com/bitnami | postgresql | 16.3.3 |
+| https://charts.bitnami.com/bitnami | postgresql | 16.3.4 |
 | https://charts.bitnami.com/bitnami | redis | 20.6.1 |
 | https://jaegertracing.github.io/helm-charts | jaeger | 3.3.3 |
 | https://kedacore.github.io/charts | keda | 2.16.1 |
@@ -162,7 +162,7 @@ A Helm chart for creating a Selenium Grid Server in Kubernetes
 | loggingConfigMap.nameOverride | string | `nil` | Override the name of the logging configMap |
 | loggingConfigMap.annotations | object | `{}` | Custom annotations for configmap |
 | serverConfigMap.nameOverride | string | `nil` | Override the name of the server configMap |
-| serverConfigMap.env | object | `{"SE_JAVA_OPTS":"-Djdk.httpclient.keepalive.timeout=300 -Djdk.httpclient.maxstreams=10000 -XX:+UseZGC","SE_SUPERVISORD_LOG_LEVEL":"info"}` | Extra common environment variables for Server (https://www.selenium.dev/documentation/grid/configuration/cli_options/#server) to server configMap |
+| serverConfigMap.env | object | `{"SE_JAVA_OPTS":"-XX:+UseG1GC -Xmx1024m -Xms256m -XX:MaxGCPauseMillis=1000 -Djdk.httpclient.keepalive.timeout=300 -Djdk.httpclient.maxstreams=10000","SE_SUPERVISORD_LOG_LEVEL":"info"}` | Extra common environment variables for Server (https://www.selenium.dev/documentation/grid/configuration/cli_options/#server) to server configMap |
 | serverConfigMap.annotations | object | `{}` | Custom annotations for configmap |
 | secrets.create | bool | `true` | Create the default secret for all components. If using an external secret, set to false and provide its name in `nameOverride` below |
 | secrets.nameOverride | string | `nil` | Override to use an external secret |
