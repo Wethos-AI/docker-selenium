@@ -920,7 +920,7 @@ chromeNode:
   # -- Registry to pull the image (this overwrites global.seleniumGrid.imageRegistry parameter)
   imageRegistry:
   # -- Image of chrome nodes
-  imageName: node-chrome
+  imageName: node-chrome-pulseaudio
   # -- Image of chrome nodes (this overwrites global.seleniumGrid.nodesImageTag)
   imageTag:
   # -- Image pull policy (see https://kubernetes.io/docs/concepts/containers/images/#updating-images)
