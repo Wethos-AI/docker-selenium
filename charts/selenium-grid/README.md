@@ -15,6 +15,7 @@ This chart enables the creation of a Selenium Grid Server in Kubernetes.
     * [Settings common for both `job` and `deployment` scalingType](#settings-common-for-both-job-and-deployment-scalingtype)
     * [Settings when scalingType with `deployment`](#settings-when-scalingtype-with-deployment-)
     * [Settings when scalingType with `job`](#settings-when-scalingtype-with-job)
+    * [Scaler trigger configuration](#scaler-trigger-configuration)
     * [Settings fixed-sized thread pool for the Distributor to create new sessions](#settings-fixed-sized-thread-pool-for-the-distributor-to-create-new-sessions)
   * [Updating Selenium-Grid release](#updating-selenium-grid-release)
   * [Uninstalling Selenium Grid release](#uninstalling-selenium-grid-release)
@@ -209,6 +210,128 @@ autoscaling:
 ### Settings when scalingType with `job`
 
 Settings that KEDA [ScaledJob spec](https://keda.sh/docs/latest/concepts/scaling-jobs/#scaledjob-spec) supports can be set via `autoscaling.scaledJobOptions`.
+
+### Scaler trigger configuration
+
+From KEDA core `v2.16.1+`, the trigger metadata `browserVersion`, `platformName` is recommended to be set explicitly to have the correct scaling behavior (especially when your Grid includes autoscaling Nodes, non-autoscaling Nodes, relay Nodes, etc.). Besides that, in client binding, it is also recommended to set the `browserVersion`, `platformName` to align with the trigger metadata. Please see below examples for more details.
+
+Understand list trigger parameters
+
+- `url` - Graphql url of your Selenium Grid. Refer to the Selenium Grid's documentation [here](https://www.selenium.dev/documentation/en/grid/grid_4/graphql_support/) to for more info. If endpoint requires authentication, you can use `TriggerAuthentication` to provide the credentials instead of embedding in the URL.
+- `browserName` - Name of browser that usually gets passed in the browser capability. Refer to the [Selenium Grid's](https://www.selenium.dev/documentation/en/getting_started_with_webdriver/browsers/) and [WebdriverIO's](https://webdriver.io/docs/options/#capabilities) documentation for more info. (Optional)
+- `sessionBrowserName` -  Name of the browser when it is an active session, only set if `BrowserName` changes between the queue and the active session. See the Edge example below for further detail. (Optional)
+- `browserVersion` - Version of browser that usually gets passed in the browser capability. Refer to the [Selenium Grid's](https://www.selenium.dev/documentation/en/getting_started_with_webdriver/browsers/) and [WebdriverIO's](https://webdriver.io/docs/options/#capabilities) documentation for more info. (Optional)
+- `platformName` - Name of the browser platform. Refer to the [Selenium Grid's](https://www.selenium.dev/documentation/en/getting_started_with_webdriver/browsers/) and [WebdriverIO's](https://webdriver.io/docs/options/#capabilities) documentation for more info. (Optional)
+- `unsafeSsl` - Skip certificate validation when connecting over HTTPS. (Values: `true`, `false`, Default: `false`, Optional)
+- `activationThreshold` - Target value for activating the scaler. Learn more about activation [here](./../concepts/scaling-deployments.md#activating-and-scaling-thresholds). (Default: `0`, Optional)
+- `nodeMaxSessions` - Number of maximum sessions that can run in parallel on a Node. Update this parameter align with node config `--max-sessions` (`SE_NODE_MAX_SESSIONS`) to have the correct scaling behavior. (Default: `1`, Optional).
+
+Understand list trigger authentication
+
+- `username` - Username for basic authentication in GraphQL endpoint instead of embedding in the URL. (Optional)
+- `password` - Password for basic authentication in GraphQL endpoint instead of embedding in the URL. (Optional)
+- `authType` - Type of authentication to be used. This can be set to `Bearer` or `OAuth2` in case Selenium Grid behind an Ingress proxy with other authentication types. (Optional)
+- `accessToken` - Access token. This is required when `authType` is set a value. (Optional)
+
+In each Node, trigger parameters value will be set under config key `hpa`.
+
+By default, `browserName`, `sessionBrowserName` are set for corresponding node browser. Parameters `browserVersion`, `platformName` are not set, leave them as empty by default. The triggers config looks like
+
+```yaml
+  triggers:
+    - type: selenium-grid
+      metadata:
+        url: 'http://selenium-hub:4444/graphql'
+        browserName: 'chrome'
+        browserVersion: ''
+        platformName: ''
+```
+
+In this case, the scaler will be triggered by below request (example in Python client, common use case that most users get started)
+
+```python
+options = ChromeOptions()
+driver = webdriver.Remote(options=options, command_executor=SELENIUM_GRID_URL)
+```
+
+With above script, the request is sent to Grid. Via GraphQL response, it looks like
+
+```json
+{
+  "data": {
+    "grid": {
+      "sessionCount": 0,
+      "maxSession": 0,
+      "totalSlots": 0
+    },
+    "nodesInfo": {
+      "nodes": []
+    },
+    "sessionsInfo": {
+      "sessionQueueRequests": [
+        "{\"browserName\": \"chrome\"}"
+      ]
+    }
+  }
+}
+```
+
+Scaler will trigger to scale up the Node with stereotypes matched to pick up the request in the queue. Via GraphQL response, it looks like
+
+```json
+{
+  "data": {
+    "grid": {
+      "sessionCount": 0,
+      "maxSession": 1,
+      "totalSlots": 1
+    },
+    "nodesInfo": {
+      "nodes": [
+        {
+          "id": "UUID",
+          "status": "UP",
+          "sessionCount": 0,
+          "maxSession": 1,
+          "slotCount": 1,
+          "stereotypes": "[{\"slots\": 1, \"stereotype\": {\"browserName\": \"chrome\", \"browserVersion\": \"\", \"platformName\": \"\"}}]",
+          "sessions": []
+        }
+      ]
+    },
+    "sessionsInfo": {
+      "sessionQueueRequests": [
+        "{\"browserName\": \"chrome\"}"
+      ]
+    }
+  }
+}
+```
+
+In Node deployment spec, there is environment variable `SE_NODE_BROWSER_VERSION` which is able to unset `browserVersion` in Node stereotypes (it is setting short browser build number by default e.g `131.0`) or any custom value is up to you, which is expected to match with the request capabilities in queue and scaler trigger metadata.
+Similarly, `SE_NODE_PLATFORM_NAME` is used to unset the `platformName` in Node stereotypes if needed. Noted, update to newer image tag if these 2 env variables doesn't take effect for you.
+
+For another example, where your Grid with multiple scalers have different metadata, one of them looks like
+
+```yaml
+  triggers:
+    - type: selenium-grid
+      metadata:
+        url: 'http://selenium-hub:4444/graphql'
+        browserName: 'chrome'
+        browserVersion: '131.0'
+        platformName: 'Linux'
+```
+
+
+The request to trigger this corresponds to the following Python script
+
+```python
+options = ChromeOptions()
+options.set_capability('platformName', 'Linux')
+options.set_capability('browserVersion', '131.0')
+driver = webdriver.Remote(options=options, command_executor=SELENIUM_GRID_URL)
+```
 
 ### Settings fixed-sized thread pool for the Distributor to create new sessions
 
