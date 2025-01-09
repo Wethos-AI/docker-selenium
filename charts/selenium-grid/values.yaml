@@ -955,7 +955,10 @@ chromeNode:
     # -- Limit resources for chrome-node pods
     limits:
       memory: "2Gi"
-      cpu: "1"
+      #
+      # Use more than 1 cpu to avoid audio skipping errors.
+      #
+      cpu: "3"
   # -- SecurityContext for chrome-node container
   securityContext: {}
   # -- Tolerations for chrome-node pods
